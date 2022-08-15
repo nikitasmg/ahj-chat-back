@@ -1,23 +1,20 @@
-const express = require('express');
-const app = express();
-const http = require('http');
-const server = http.createServer(app);
+const express = require("express");
+const { createServer } = require("http");
 const { Server } = require("socket.io");
-const cors = require('cors')
-const io = new Server(server);
 
+const app = express();
+const httpServer = createServer(app);
+const io = new Server(httpServer, { /* options */ });
+
+const cors = require('cors')
 const bodyParser = require('body-parser')
+const port= process.env.PORT|| 3000;
 
 const users = []
-
-const port= process.env.PORT|| 3000;
 
 app.use(bodyParser.json())
 app.use(cors())
 
-io.use((socket, next) => {
-    const token = socket.handshake.auth.token;
-});
 
 app.post('/login',(req, res) => {
         const {name} = req.body
@@ -30,15 +27,23 @@ app.post('/login',(req, res) => {
         res.send(`User ${name} logged in`)
 } )
 
-io.on('connection', (socket) => {
-    console.log('user a ' +
-        '')
-    socket.on('chatMessage', (...args) => {
-        console.log(args)
-        socket.emit('chatMessage',args )
-    })
+io.on("connection", (socket) => {
+    console.log('user connected')
+    console.log(socket.handshake)
+
+    socket.on('disconnect', () => {
+        console.log('user disconnected');
+        io.emit('user disconnected')
+    });
+
+    socket.on('chat message', (args) => {
+        const {name, message} = args
+        console.log(name, message);
+        io.emit("chat message", args)
+    });
 });
 
-server.listen(port, () => {
+
+httpServer.listen(port, () => {
     console.log(`server started on port ${port}`);
 });
