@@ -3,6 +3,7 @@ const app = express();
 const http = require('http');
 const server = http.createServer(app);
 const { Server } = require("socket.io");
+const cors = require('cors')
 const io = new Server(server);
 
 const bodyParser = require('body-parser')
@@ -12,6 +13,7 @@ const users = []
 const port= process.env.PORT|| 3000;
 
 app.use(bodyParser.json())
+app.use(cors())
 
 io.use((socket, next) => {
     const token = socket.handshake.auth.token;
