@@ -4,7 +4,9 @@ const {Server} = require("socket.io");
 
 const app = express();
 const httpServer = createServer(app);
-const io = new Server(httpServer, { /* options */});
+const io = new Server(httpServer);
+const swaggerUi = require('swagger-ui-express');
+const swaggerDocument = require('./swagger.json');
 
 const cors = require('cors')
 const bodyParser = require('body-parser')
@@ -14,6 +16,7 @@ const users = [{name:'Nikita', token: 1660732113229}]
 
 app.use(bodyParser.json())
 app.use(cors())
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // app.get('/', (req, res) => {
 //     res.sendFile(__dirname + '/index.html');
@@ -23,11 +26,11 @@ app.use(cors())
 app.post('/login', (req, res) => {
     const {name} = req.body
     if (!name) {
-        res.status(400).json({message: 'Поле name обязательное'})
+        res.status(400).json({success: false,message: 'Поле name обязательное'})
         return
     }
     if (users.some((el) => el === name)) {
-        res.status(400).json({success: false, message: `Имя ${name} уже занято `})
+        res.status(401).json({success: false, message: `Имя ${name} уже занято `})
     } else {
         const token = Date.now()
         const user = {name, token}

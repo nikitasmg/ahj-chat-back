@@ -1,6 +1,0 @@
-class User {
-
-    login(name) {
-
-    }
-}
