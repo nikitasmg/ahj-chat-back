@@ -6,7 +6,7 @@ const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
     cors: {
-        origin: 'http://localhost:8080',
+        origin: '*',
     }
 });
 const swaggerUi = require('swagger-ui-express');
@@ -50,17 +50,17 @@ io.on("connection", (socket) => {
         })
     }
     else {
-        console.log(`user ${user.name} connected`)
-        io.emit('login', user.name)
+        const allUsers = users.map(user =>{return user.name} )
+        io.emit('login', {user:user.name, users:allUsers})
     }
 
     socket.on('disconnect', () => {
-        console.log(`user ${user.name} disconnected`);
-        io.emit('user disconnected')
+        users.filter(el => el.name !== user.name)
+        io.emit('user disconnected',user.name)
     });
 
     socket.on('chat message', (...args) => {
-        io.emit('chat message', args);
+        io.emit('chat message', ...args);
     });
 });
 
