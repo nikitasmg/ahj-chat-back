@@ -16,7 +16,7 @@ const cors = require('cors')
 const bodyParser = require('body-parser')
 const port = process.env.PORT || 3000;
 
-const users = [{name:'Nikita', token: 1660732113229}]
+let users = [{name:'Nikita', token: 1660732113229}]
 
 app.use(bodyParser.json())
 app.use(cors())
@@ -55,7 +55,7 @@ io.on("connection", (socket) => {
     }
 
     socket.on('disconnect', () => {
-        users.filter(el => el.name !== user.name)
+        users = users.filter(el => el.name !== user.name)
         io.emit('user disconnected',user.name)
     });
 
